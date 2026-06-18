@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quien Invita - Guía Gastronómica</title>
+    <style>
+        :root {
+            --primary: #FF4757;
+            --dark: #2F3542;
+            --light: #F1F2F6;
+            --white: #FFFFFF;
+            --grey: #747D8C;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            padding-bottom: 20px;
+        }
+
+        /* Header */
+        header {
+            background-color: var(--white);
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        header h1 {
+            color: var(--primary);
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 5px;
+        }
+
+        header p {
+            font-size: 14px;
+            color: var(--grey);
+        }
+
+        /* Buscador y Filtros */
+        .search-container {
+            padding: 15px;
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: 12px 20px;
+            border: 1px solid #DFE4EA;
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .filters {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 5px 15px 15px 15px;
+            scrollbar-width: none;
+        }
+
+        .filters::-webkit-scrollbar {
+            display: none;
+        }
+
+        .filter-btn {
+            background-color: var(--white);
+            color: var(--dark);
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid #DFE4EA;
+            font-size: 14px;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-btn.active, .filter-btn:hover {
+            background-color: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+        }
+
+        /* Lista de Locales */
+        .feed {
+            padding: 0 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card {
+            background-color: var(--white);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .card-img {
+            width: 100%;
+            height: 180px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        .promo-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background-color: var(--primary);
+            color: var(--white);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+        }
+
+        .card-content {
+            padding: 15px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .card-tag {
+            font-size: 12px;
+            color: var(--primary);
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .card-info {
+            font-size: 14px;
+            color: var(--grey);
+            margin-bottom: 12px;
+        }
+
+        .card-btn {
+            display: block;
+            width: 100%;
+            text-align: center;
+            background-color: var(--dark);
+            color: var(--white);
+            padding: 10px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .card-btn:hover {
+            background-color: #1e222b;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>¿Quién Invita?</h1>
+        <p>Descubrí los mejores locales de Asunción</p>
+    </header>
+
+    <div class="search-container">
+        <input type="text" id="searchInput" class="search-bar" placeholder="¿Qué querés comer hoy?">
+    </div>
+
+    <div class="filters">
+        <button class="filter-btn active" onclick="filterCategory('todos')">Todos</button>
+        <button class="filter-btn" onclick="filterCategory('burgers')">Burgers</button>
+        <button class="filter-btn" onclick="filterCategory('bar')">Bars & Pubs</button>
+        <button class="filter-btn" onclick="filterCategory('pizza')">Pizzerías</button>
+        <button class="filter-btn" onclick="filterCategory('cafe')">Cafeterías</button>
+    </div>
+
+    <div class="feed" id="localesFeed">
+        <!-- Los locales se cargan dinámicamente con JavaScript -->
+    </div>
+
+    <script>
+        // Base de datos simulada de los locales (Esto es lo que vas a cargar)
+        const locales = [
+            {
+                nombre: "Burme's Villa Morra",
+                categoria: "burgers",
+                tag: "Hamburguesería Premium",
+                promo: "2x1 en Burgers los Martes",
+                direccion: "Avda. Mariscal López, Asunción",
+                imagen: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?q=80&w=500",
+                linkMapa: "https://waze.com"
+            },
+            {
+                nombre: "The Shamrock Pub",
+                categoria: "bar",
+                tag: "Bar & Restó",
+                promo: "Chopp de bienvenida con la App",
+                direccion: "Mariscal Estigarribia, Asunción",
+                imagen: "https://images.unsplash.com/photo-1514933651103-005eec06c04b?q=80&w=500",
+                linkMapa: "https://waze.com"
+            },
+            {
+                nombre: "Pulcinella Pizza",
+                categoria: "pizza",
+                tag: "Pizzería Artesanal",
+                promo: "10% OFF pagando en efectivo",
+                direccion: "Paseo La Galería, Asunción",
+                imagen: "https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=500",
+                linkMapa: "https://waze.com"
+            }
+        ];
+
+        const feedContainer = document.getElementById('localesFeed');
+        const searchInput = document.getElementById('searchInput');
+
+        // Función para renderizar los locales en la pantalla
+        function displayLocales(lista) {
+            feedContainer.innerHTML = '';
+            if(lista.length === 0) {
+                feedContainer.innerHTML = `<p style="text-align:center; color:gray; padding:20px;">No encontramos locales que coincidan.</p>`;
+                return;
+            }
+            
+            lista.forEach(local => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="card-img" style="background-image: url('${local.imagen}')">
+                        <div class="promo-badge">${local.promo}</div>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-tag">${local.tag}</div>
+                        <div class="card-title">${local.nombre}</div>
+                        <div class="card-info">📍 ${local.direccion}</div>
+                        <a href="${local.linkMapa}" target="_blank" class="card-btn">¿Cómo llegar?</a>
+                    </div>
+                `;
+                feedContainer.appendChild(card);
+            });
+        }
+
+        // Buscador funcional en tiempo real
+        searchInput.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const filtrados = locales.filter(l => 
+                l.nombre.toLowerCase().includes(term) || 
+                l.tag.toLowerCase().includes(term)
+            );
+            displayLocales(filtrados);
+        });
+
+        // Filtros por botones de categoría
+        function filterCategory(cat) {
+            // Cambiar estado activo de los botones
+            const botones = document.querySelectorAll('.filter-btn');
+            botones.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            if(cat === 'todos') {
+                displayLocales(locales);
+            } else {
+                const filtrados = locales.filter(l => l.categoria === cat);
+                displayLocales(filtrados);
+            }
+        }
+
+        // Carga inicial
+        displayLocales(locales);
+    </script>
+</body>
+</html>
